@@ -14,9 +14,10 @@ export const useAuthStore = defineStore<'auth', AuthState>('auth', {
     isLoggedIn: false,
   }),
   actions: {
+
     async login(username: string, password: string) {
       try {
-        const response = await login(username, password);
+        const response = await login({username, password});
         this.token = response.token;
         this.username = response.username;
         this.isLoggedIn = true;

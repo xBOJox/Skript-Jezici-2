@@ -2,18 +2,24 @@
   <nav class="nav">
     <ul>
       <li><router-link to="/">Home</router-link></li>
-      <li><router-link to="/gallery">Gallery</router-link></li>
-      <li><router-link to="/drawing">Drawing</router-link></li>
-      <li><router-link to="/login">Login</router-link></li>
-      <li><router-link to="/register">Register</router-link></li>
+
+      <div v-if="authStore.isLoggedIn">
+        <li><router-link to="/gallery">Gallery</router-link></li>
+        <li><router-link to="/drawing">Drawing</router-link></li>
+        <li>Hello, {{authStore.username}}</li>
+      </div>
+      <div v-else>
+        <li><router-link to="/login">Login</router-link></li>
+        <li><router-link to="/register">Register</router-link></li>
+      </div>
     </ul>
   </nav>
 </template>
 
-<script>
-export default {
-  name: 'Nav'
-}
+<script setup lang="ts">
+import {useAuthStore} from "@/store/auth.ts";
+
+const authStore = useAuthStore()
 </script>
 
 <style>

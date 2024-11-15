@@ -1,73 +1,74 @@
 <template>
-  <div>
+  <div class="login-page">
     <h1>Login</h1>
-    <form>
+    <div class="login-container">
       <label for="username">Username:</label>
-      <input type="text" id="username" v-model="username" />
+      <input type="text" id="username" v-model="username"/>
       <div v-if="usernameError" class="error">{{ usernameError }}</div>
-      <br />
+      <br/>
       <label for="password">Password:</label>
-      <input type="password" id="password" v-model="password" />
+      <input type="password" id="password" v-model="password"/>
       <div v-if="passwordError" class="error">{{ passwordError }}</div>
-      <br />
-      <button @click="login">Login</button>
-    </form>
+      <br/>
+      <button @click.prevent="login">Login</button>
+    </div>
   </div>
 </template>
 
-<script>
-import api from '../api/api';
-import { useAuthStore } from '../stores/auth';
+<script setup lang="ts" `>
+import {useAuthStore} from '../store/auth';
+import {ref} from "vue";
 
-export default {
-  name: 'Login',
-  data() {
-    return {
-      username: '',
-      password: '',
-      usernameError: null,
-      passwordError: null,
-    };
-  },
-  methods: {
-    async login() {
-      this.usernameError = null;
-      this.passwordError = null;
+import { useRouter } from 'vue-router'
 
-      if (!this.validateUsername()) {
-        this.usernameError = 'Username must be between 2 and 32 characters long.';
-      }
+const authStore = useAuthStore();
+const router = useRouter();
+const username = ref('');
+const password = ref('');
+const usernameError = ref('');
+const passwordError = ref('');
 
-      if (!this.validatePassword()) {
-        this.passwordError = 'Password must be between 8 and 128 characters long.';
-      }
+const emit = defineEmits(['login-success', 'login-error'])
 
-      if (this.usernameError || this.passwordError) {
-        return;
-      }
+const  login = async () => {
+  usernameError.value = '';
+  passwordError.value = '';
 
-      try {
-        const response = await api.login(this.username, this.password);
-        const authStore = useAuthStore();
-        authStore.login(response.token, response.username);
-        this.$emit('login-success');
-      } catch (error) {
-        this.$emit('login-error', error);
-      }
-    },
-    validateUsername() {
-      return this.username.length >= 2 && this.username.length <= 32;
-    },
-    validatePassword() {
-      return this.password.length >= 8 && this.password.length <= 128;
-    },
-  },
-};
+  if (!validateUsername()) {
+    usernameError.value = 'Username must be between 2 and 32 characters long.';
+  }
+
+  if (!validatePassword()) {
+    passwordError.value = 'Password must be between 8 and 128 characters long.';
+  }
+
+  if (usernameError.value || passwordError.value) {
+    return;
+  }
+
+  try {
+    authStore.login(username.value, password.value);
+    emit('login-success');
+    router.push({ path: '/drawing' });
+  } catch (error) {
+    console.error(error)
+    emit('login-error', error);
+  }
+}
+
+const validateUsername = () => {
+  return username.value.length >= 2 && username.value.length <= 32;
+
+}
+
+const validatePassword = () => {
+  return password.value.length >= 8 && password.value.length <= 128;
+}
 </script>
 
-<style>
+<style scoped>
 /* Add some basic styling to the login form */
-form {
+.login-container {
   width: 300px;
   margin: 40px auto;
   padding: 20px;
@@ -82,7 +83,7 @@ label {
 }
 
 input[type="text"], input[type="password"] {
-  width: 100%;
+  width: 90%;
   height: 40px;
   margin-bottom: 20px;
   padding: 10px;

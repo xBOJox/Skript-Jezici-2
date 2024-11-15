@@ -18,6 +18,7 @@
 <script>
 import {register} from '../api/api';
 
+
 export default {
   name: 'Register',
   emits: ['showError'],
@@ -44,7 +45,7 @@ export default {
         }
         try {
             const response = await register(this.username, this.password);
-            this.$router.push({ name: 'login' });
+            this.$router.push({ path: '/login' });
         }catch (error) {
             if (error.response) {
                 this.$emit('showError', error.response.data);
@@ -75,7 +76,7 @@ label {
 }
 
 input[type="text"], input[type="email"], input[type="password"] {
-  width: 100%;
+  width: 90%;
   height: 40px;
   margin-bottom: 20px;
   padding: 10px;

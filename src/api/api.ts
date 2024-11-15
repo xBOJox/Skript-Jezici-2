@@ -4,12 +4,21 @@ const api = axios.create({
   baseURL: 'https://raf-pixeldraw.aarsen.me/api',
 });
 
-export async function login(username: string, password: string) {
+type LoginReq = {
+  username: string;
+  password: string;
+}
+
+type LoginRes = {
+  failed: boolean,
+  token: string,
+  user_id: string,
+  username: string,
+}
+
+export async function login(request: LoginReq) : Promise<LoginRes> {
   try {
-    const response = await api.post('/auth/login', {
-      username,
-      password,
-    });
+    const response = await api.post('/auth/login', request);
     return response.data;
   } catch (error: any) {
     if (error.response && error.response.data) {
