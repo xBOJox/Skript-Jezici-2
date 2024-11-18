@@ -7,6 +7,7 @@
         <li><router-link to="/gallery">Gallery</router-link></li>
         <li><router-link to="/drawing">Drawing</router-link></li>
         <li>Hello, {{authStore.username}}</li>
+        <li><button @click="logout" class="logout-button">Logout</button></li>
       </div>
       <div v-else>
         <li><router-link to="/login">Login</router-link></li>
@@ -18,8 +19,15 @@
 
 <script setup lang="ts">
 import {useAuthStore} from "@/store/auth.ts";
-
+import { useRouter } from "vue-router";
 const authStore = useAuthStore()
+
+const router = useRouter();
+
+const logout = () => {
+  authStore.logout(); // Clear tokens and reset state
+  router.push("/");   // Redirect to homepage
+};
 </script>
 
 <style>
@@ -52,5 +60,18 @@ const authStore = useAuthStore()
 
 .router-link-exact-active {
   color: #ccc;
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1em;
+}
+
+.logout-button:hover {
+  color: #ccc;
+  text-decoration: underline;
 }
 </style>

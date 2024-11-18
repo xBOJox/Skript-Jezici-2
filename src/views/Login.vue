@@ -11,6 +11,7 @@
       <div v-if="passwordError" class="error">{{ passwordError }}</div>
       <br/>
       <button @click.prevent="login">Login</button>
+      <div v-if="generalError" class="error">{{ generalError }}</div>
     </div>
   </div>
 </template>
@@ -27,12 +28,14 @@ const username = ref('');
 const password = ref('');
 const usernameError = ref('');
 const passwordError = ref('');
+const generalError = ref('');
 
 const emit = defineEmits(['login-success', 'login-error'])
 
 const  login = async () => {
   usernameError.value = '';
   passwordError.value = '';
+  generalError.value = '';
 
   if (!validateUsername()) {
     usernameError.value = 'Username must be between 2 and 32 characters long.';
@@ -47,11 +50,16 @@ const  login = async () => {
   }
 
   try {
-    authStore.login(username.value, password.value);
-    emit('login-success');
-    router.push({ path: '/drawing' });
+    const success = await authStore.login(username.value, password.value);
+    if (success) {
+      emit('login-success');
+      router.push({ path: '/drawing' });
+    } else {
+      generalError.value = 'Login failed. Please check your credentials.';
+    }
   } catch (error) {
-    console.error(error)
+    console.error(error);
+    generalError.value = 'An unexpected error occurred. Please try again.';
     emit('login-error', error);
   }
 }

@@ -9,9 +9,9 @@ interface AuthState {
 
 export const useAuthStore = defineStore<'auth', AuthState>('auth', {
   state: () => ({
-    token: null,
-    username: null,
-    isLoggedIn: false,
+    token: localStorage.getItem('token'),
+    username: localStorage.getItem('username'),
+    isLoggedIn: !!localStorage.getItem('token'),
   }),
   actions: {
 
@@ -21,8 +21,12 @@ export const useAuthStore = defineStore<'auth', AuthState>('auth', {
         this.token = response.token;
         this.username = response.username;
         this.isLoggedIn = true;
+        localStorage.setItem('token', response.token);
+        localStorage.setItem('username', response.username);
+        return true;
       } catch (error) {
         console.error(error);
+        throw error;
       }
     },
     async register(username: string, password: string) {
@@ -33,12 +37,22 @@ export const useAuthStore = defineStore<'auth', AuthState>('auth', {
         this.isLoggedIn = true;
       } catch (error) {
         console.error(error);
+        throw error;
       }
     },
     logout() {
       this.token = null;
       this.username = null;
       this.isLoggedIn = false;
+
+      // Clear from localStorage
+      localStorage.removeItem('token');
+      localStorage.removeItem('username');
+    },
+    syncWithLocalStorage() {
+      this.token = localStorage.getItem('token');
+      this.username = localStorage.getItem('username');
+      this.isLoggedIn = !!this.token;
     },
   },
 });
